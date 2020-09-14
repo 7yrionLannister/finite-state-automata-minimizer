@@ -1,9 +1,22 @@
 package model;
 
-public class MooreMachine<Q, S, R> extends Automaton<MooreState<Q, R>, S, R> {
+import java.util.HashMap;
 
-    public MooreMachine(MooreState<Q, R> initialState) {
+public class MooreMachine<Q, S, R> extends Automaton<Q, S, R> {
+    private HashMap<Q, R> responses;
+
+    public MooreMachine(Q initialState) {
         super(initialState);
+        responses = new HashMap<>();
+    }
+
+    public boolean insertState(Q state, R response) {
+        if(!responses.containsKey(state)) {
+            responses.put(state, response);
+            insertVertex(state);
+            return true;
+        }
+        return false;
     }
 
     @Override

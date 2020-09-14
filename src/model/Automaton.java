@@ -1,6 +1,7 @@
 package model;
 
 import dataStructures.AdjacencyListGraph;
+import dataStructures.Edge;
 import dataStructures.Vertex;
 
 import java.util.ArrayList;
@@ -24,8 +25,12 @@ public abstract class Automaton<Q, S, R> extends AdjacencyListGraph<Q> implement
         q0 = initialState;
     }
 
-    public boolean insertState(Q e) {
-        return insertVertex(e);
+    public void relate(Q src, Q dst, S stimulus) {
+        PairQS fi = new PairQS(src, stimulus);
+        if(!f.containsKey(fi)) {
+            super.link(src, dst, 1);
+            f.put(fi, dst);
+        }
     }
 
     public Q stateTransitionFunction(Q current, S stimulus) {
