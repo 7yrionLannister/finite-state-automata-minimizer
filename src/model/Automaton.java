@@ -1,16 +1,14 @@
 package model;
 
 import dataStructures.AdjacencyListGraph;
-import dataStructures.Edge;
-import dataStructures.Vertex;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Objects;
+import java.util.HashSet;
 
 public abstract class Automaton<Q, S, R> extends AdjacencyListGraph<Q> implements IAutomaton<Q, S, R> {
-    private ArrayList<S> stimuliSet;
-    private ArrayList<R> responsesSet;
+    private HashSet<S> stimuliSet;
+    private HashSet<R> responsesSet;
     private HashMap<PairQS, Q> f;
     private Q q0;
     private Q currentState;
@@ -19,22 +17,34 @@ public abstract class Automaton<Q, S, R> extends AdjacencyListGraph<Q> implement
      * */
     public Automaton(Q initialState) {
         super(true);
-        stimuliSet = new ArrayList<>();
-        responsesSet = new ArrayList<>();
+        stimuliSet = new HashSet<>();
+        responsesSet = new HashSet<>();
         f = new HashMap<>();
         q0 = initialState;
+        insertVertex(q0);
     }
 
     public void relate(Q src, Q dst, S stimulus) {
         PairQS fi = new PairQS(src, stimulus);
-        if(!f.containsKey(fi)) {
+        if(!f.containsKey(fi) && containsVertex(src) && containsVertex(dst)) {
             super.link(src, dst, 1);
             f.put(fi, dst);
+            stimuliSet.add(stimulus);
         }
+    }
+
+    @Override
+    public boolean unlink(Q src, Q dst) {
+        // Operation not supported in this subclass")
+        return false;
     }
 
     public Q stateTransitionFunction(Q current, S stimulus) {
         return f.get(new PairQS(current, stimulus));
+    }
+
+    public HashSet<R> getResponsesSet() {
+        return responsesSet;
     }
 
     public class PairQS {
