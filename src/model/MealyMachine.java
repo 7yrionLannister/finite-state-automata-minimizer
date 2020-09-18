@@ -7,7 +7,7 @@ public class MealyMachine<Q, S, R> extends Automaton<Q, S, R> {
     }
 
     @Override
-    public IAutomaton minimize() {
+    public MealyMachine<Q, S, R> minimize() {
         return null;
     }
 }

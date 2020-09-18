@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 
-public abstract class Automaton<Q, S, R> extends AdjacencyListGraph<Q> implements IAutomaton<Q, S, R> {
+public abstract class Automaton<Q, S, R> extends AdjacencyListGraph<Q> {
     private HashSet<S> stimuliSet;
     private HashSet<R> responsesSet;
     private HashMap<PairQS, Q> f;
@@ -24,13 +24,15 @@ public abstract class Automaton<Q, S, R> extends AdjacencyListGraph<Q> implement
         insertVertex(q0);
     }
 
-    public void relate(Q src, Q dst, S stimulus) {
+    public boolean relate(Q src, Q dst, S stimulus) {
         PairQS fi = new PairQS(src, stimulus);
         if(!f.containsKey(fi) && containsVertex(src) && containsVertex(dst)) {
             super.link(src, dst, 1);
             f.put(fi, dst);
             stimuliSet.add(stimulus);
+            return true;
         }
+        return false;
     }
 
     @Override
@@ -46,6 +48,21 @@ public abstract class Automaton<Q, S, R> extends AdjacencyListGraph<Q> implement
     public HashSet<R> getResponsesSet() {
         return responsesSet;
     }
+    public  HashSet<S> getStimuliSet() {
+        return stimuliSet;
+    }
+
+    public Q getInitialState() {
+        return q0;
+    }
+
+    @Override
+    public boolean isEmpty() {
+        // an automaton has at least the initial state, therefore it is never empty
+        return false;
+    }
+
+    public abstract Automaton<Q, S, R> minimize();
 
     public class PairQS {
         private Q state;

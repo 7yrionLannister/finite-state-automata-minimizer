@@ -15,6 +15,7 @@ public class MooreMachineTest {
 
     private void setupStage1() {
         mooreMachine = new MooreMachine<>('A', false);
+        mooreMachine = mooreMachine.minimize();
     }
 
     private void setupStageM1() {
@@ -85,7 +86,7 @@ public class MooreMachineTest {
     @Test
     public void insertAndSearchStateTest() {
         setupStage1();
-        assertTrue(mooreMachine.isEmpty(), "Graph must be initially empty");
+        assertFalse(mooreMachine.isEmpty(), "Automata are never empty");
         stateInsertionLoop();
     }
 
@@ -214,17 +215,23 @@ public class MooreMachineTest {
     }
 
     private void stateInsertionLoop() {
-        int vertexCount = 0;
+        int stateCount = 1; //just has the initial state
         for (int i = 0; i < 50; i++) {
             char r = (char) (Math.random() * 100);
             if (mooreMachine.insertState(r, ((int) (Math.random() * 100)) % 2 == 0)) {
-                vertexCount++;
+                stateCount++;
             }
             assertTrue(mooreMachine.containsVertex(r), "The vertex with key " + r + " must have been found as it was added either in a previous iteration of the for loop or in this iteration");
-            assertTrue(mooreMachine.getOrder() == vertexCount, "The order is not the expected");
+            assertTrue(mooreMachine.getOrder() == stateCount, "The order is not the expected");
             assertTrue(mooreMachine.getAdjacent(r).isEmpty(), "The vertex just added should not have any edges");
             assertFalse(mooreMachine.isEmpty(), "Graph must not be empty after insertion");
         }
         assertFalse(mooreMachine.containsVertex((char) 200), "No vertex with key 200 was added so it should not have been found");
+    }
+
+    @Test
+    public void minimizeTest() {
+        setupStageM1();
+        mooreMachine.minimize();
     }
 }
