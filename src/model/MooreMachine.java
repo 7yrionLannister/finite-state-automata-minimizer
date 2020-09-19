@@ -45,21 +45,38 @@ public class MooreMachine<Q, S, R> extends Automaton<Q, S, R> {
             }
             originPartitions.get(responseToIndex.get(r)).add(q);
         }
-        //for(int i = 0) partition everything
         boolean previousEqualsCurrent = false;
         while (!previousEqualsCurrent) {
             previousPartitions = (ArrayList<ArrayList<Q>>) originPartitions.clone();
-            HashMap<S, HashMap<Integer, HashMap<Integer, ArrayList<Q>>>> originPartitioned = new HashMap<>(); //for each stimulus there is a version of the partition
-
+            System.out.println("let's partition, origin size = " + originPartitions.size() + ", previous size = " + previousPartitions.size());
             //TODO partition with every stimulus and see if at least one change, if not then it's done
             for (S s : getStimuliSet()) {
-                originPartitioned.put(s, new HashMap<>());
+                System.out.println("Partition is being made with input s = "+ s);
+                HashMap<Integer, HashMap<Integer, ArrayList<Q>>> originPartitioned = new HashMap<>();
+                int newNumberOfPartitions = 0;
                 for (int i = 0; i < originPartitions.size(); i++) {
-                    originPartitioned.get(s).put(i, refineSubset(originPartitions, i, s));
+                    HashMap<Integer, ArrayList<Q>> refinement = refineSubset(originPartitions, i, s);
+                    originPartitioned.put(i, refinement);
+                    newNumberOfPartitions += refinement.size();
+                    System.out.println("Number of subsets found at the moment = " + newNumberOfPartitions);
                 }
-                //TODO join the subset as every hashmap that refine() returns has a part of it
+                if(newNumberOfPartitions > originPartitions.size()) {
+                    System.out.println("New partition found, proceed with replacement");
+                    /* Pk was actually partitioned.
+                    * Replace the previous partition with the current one and fill the new "origin" with the last resulting partition
+                    * */
+                    previousPartitions = originPartitions;
+                    originPartitions = new ArrayList<>();
+                    for(int i = 0; i < originPartitioned.size(); i++) {
+                        HashMap<Integer, ArrayList<Q>> parts = originPartitioned.get(i);
+                        for(int j = 0; j < parts.size(); j++)
+                        originPartitions.add(parts.get(j));
+                    }
+                    break;
+                }
             }
-            previousEqualsCurrent = true; //TODO this is just to compile, change it for the real condition later (compare the previous partition with the current one)
+
+            previousEqualsCurrent = previousPartitions.size() == originPartitions.size();
         }
         //TODO complete and delete prints
         for (int i = 0; i < originPartitions.size(); i++) {
@@ -82,6 +99,7 @@ public class MooreMachine<Q, S, R> extends Automaton<Q, S, R> {
         for (int i = 0; i < targetPartition.size(); i++) {
             Q src = targetPartition.get(i);
             Q dst = stateTransitionFunction(src, s);
+            System.out.println("src = " + src + ", dst = " + dst);
             boolean found = false;
             int j = 0;
             for (j = 0; j < originalPartition.size() && !found; j++) {
@@ -92,6 +110,7 @@ public class MooreMachine<Q, S, R> extends Automaton<Q, S, R> {
                     }
                 }
             }
+            System.out.println("state " + src + " was in subset " + j);
             stateToIndexInOrigin.put(src, j);
             if (!refinedPartition.containsKey(j)) {
                 refinedPartition.put(j, new ArrayList<>());

@@ -9,12 +9,13 @@ import java.util.HashSet;
 public abstract class Automaton<Q, S, R> extends AdjacencyListGraph<Q> {
     private HashSet<S> stimuliSet;
     private HashSet<R> responsesSet;
-    private HashMap<PairQS, Q> f;
+    private HashMap<Q, HashMap<S, Q>> f;
     private Q q0;
     private Q currentState;
 
-    /**The vertices of the graph compose the set of states
-     * */
+    /**
+     * The vertices of the graph compose the set of states
+     */
     public Automaton(Q initialState) {
         super(true);
         stimuliSet = new HashSet<>();
@@ -25,10 +26,13 @@ public abstract class Automaton<Q, S, R> extends AdjacencyListGraph<Q> {
     }
 
     public boolean relate(Q src, Q dst, S stimulus) {
-        PairQS fi = new PairQS(src, stimulus);
-        if(!f.containsKey(fi) && containsVertex(src) && containsVertex(dst)) {
+        if (!f.containsKey(src)) {
+            f.put(src, new HashMap<>());
+        }
+        if (!f.get(src).containsKey(stimulus) && containsVertex(src) && containsVertex(dst)) {
+            System.out.println("relating");
             super.link(src, dst, 1);
-            f.put(fi, dst);
+            f.get(src).put(stimulus, dst);
             stimuliSet.add(stimulus);
             return true;
         }
@@ -42,13 +46,17 @@ public abstract class Automaton<Q, S, R> extends AdjacencyListGraph<Q> {
     }
 
     public Q stateTransitionFunction(Q current, S stimulus) {
-        return f.get(new PairQS(current, stimulus));
+        if (f.containsKey(current)) {
+            return f.get(current).get(stimulus);
+        }
+        return null;
     }
 
     public HashSet<R> getResponsesSet() {
         return responsesSet;
     }
-    public  HashSet<S> getStimuliSet() {
+
+    public HashSet<S> getStimuliSet() {
         return stimuliSet;
     }
 
@@ -63,31 +71,4 @@ public abstract class Automaton<Q, S, R> extends AdjacencyListGraph<Q> {
     }
 
     public abstract Automaton<Q, S, R> minimize();
-
-    public class PairQS {
-        private Q state;
-        private S stimulus;
-        public PairQS(Q q, S s) {
-            if(q == null || s == null) {
-                throw new NullPointerException();
-            }
-            state = q;
-            stimulus = s;
-        }
-        public Q getState() {
-            return  state;
-        }
-        public S getStimulus() {
-            return stimulus;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            PairQS pairQS = (PairQS) o;
-            return state.equals(pairQS.state) &&
-                    stimulus.equals(pairQS.stimulus);
-        }
-    }
 }

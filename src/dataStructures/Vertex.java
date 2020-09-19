@@ -1,6 +1,5 @@
 package dataStructures;
 
-import org.jetbrains.annotations.NotNull;
 
 public class Vertex<E> implements Comparable<Vertex<E>> {
 	public static enum Color {WHITE, GRAY, BLACK}
