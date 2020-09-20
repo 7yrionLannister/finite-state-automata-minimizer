@@ -93,7 +93,6 @@ public class MooreMachineTest {
     @Test
     public void relateStatesTest() {
         setupStage1();
-        assertTrue(mooreMachine.isEmpty(), "Graph must be initially empty");
         setupStageGraphWithIsolatedVertices();
 
         char src = 1;
@@ -140,78 +139,6 @@ public class MooreMachineTest {
         dst = 1;
         stimulus = false;
         mooreMachine.relate(src, dst, stimulus);
-    }
-
-    @Test
-    public void BFSInDirectedGraphTest() {
-        relateStatesTest();
-        char src = 8;
-        mooreMachine.BFS(src);
-        assertTrue(mooreMachine.getVertexColor(src) == Vertex.Color.BLACK && mooreMachine.getSingleSourceDistance(src) == 0);
-        assertTrue(mooreMachine.getVertexColor((char) 3) == Vertex.Color.BLACK && mooreMachine.getSingleSourceDistance((char) 3) > 0);
-        assertTrue(mooreMachine.getVertexColor((char) 5) == Vertex.Color.BLACK && mooreMachine.getSingleSourceDistance((char) 5) > 0);
-        assertTrue(mooreMachine.getVertexColor((char) 6) == Vertex.Color.WHITE && mooreMachine.getSingleSourceDistance((char) 6) == Integer.MAX_VALUE);
-        assertTrue(mooreMachine.getVertexColor((char) 1) == Vertex.Color.WHITE && mooreMachine.getSingleSourceDistance((char) 1) == Integer.MAX_VALUE);
-        assertTrue(mooreMachine.getVertexColor((char) 2) == Vertex.Color.WHITE && mooreMachine.getSingleSourceDistance((char) 2) == Integer.MAX_VALUE);
-        assertTrue(mooreMachine.getVertexColor((char) 4) == Vertex.Color.WHITE && mooreMachine.getSingleSourceDistance((char) 4) == Integer.MAX_VALUE);
-        assertTrue(mooreMachine.getVertexColor((char) 7) == Vertex.Color.WHITE && mooreMachine.getSingleSourceDistance((char) 7) == Integer.MAX_VALUE);
-        ArrayList<Character> leastStopsPath = mooreMachine.getSingleSourcePath((char) 5);
-        assertTrue(leastStopsPath.get(0) == src && mooreMachine.getLastSrc() == src, "Source is not the expected");
-        assertTrue(leastStopsPath.get(1) == 5, "It is not the least stops path");
-
-        leastStopsPath = mooreMachine.getSingleSourcePath((char) 1);
-        assertTrue(leastStopsPath.isEmpty(), "Vertex 1 is not reachable from source " + src + " so the path must be empty");
-
-        src = 1;
-        mooreMachine.BFS(src);
-        assertTrue(mooreMachine.getVertexColor(src) == Vertex.Color.BLACK && mooreMachine.getSingleSourceDistance(src) == 0);
-        assertTrue(mooreMachine.getVertexColor((char) 3) == Vertex.Color.BLACK && mooreMachine.getSingleSourceDistance((char) 3) > 0);
-        assertTrue(mooreMachine.getVertexColor((char) 5) == Vertex.Color.BLACK && mooreMachine.getSingleSourceDistance((char) 5) > 0);
-        assertTrue(mooreMachine.getVertexColor((char) 2) == Vertex.Color.BLACK && mooreMachine.getSingleSourceDistance((char) 2) > 0);
-        assertTrue(mooreMachine.getVertexColor((char) 7) == Vertex.Color.BLACK && mooreMachine.getSingleSourceDistance((char) 7) > 0);
-        assertTrue(mooreMachine.getVertexColor((char) 8) == Vertex.Color.BLACK && mooreMachine.getSingleSourceDistance((char) 8) > 0);
-        assertTrue(mooreMachine.getVertexColor((char) 6) == Vertex.Color.WHITE && mooreMachine.getSingleSourceDistance((char) 6) == Integer.MAX_VALUE);
-        assertTrue(mooreMachine.getVertexColor((char) 4) == Vertex.Color.WHITE && mooreMachine.getSingleSourceDistance((char) 4) == Integer.MAX_VALUE);
-        leastStopsPath = mooreMachine.getSingleSourcePath((char) 4);
-        assertTrue(leastStopsPath.isEmpty(), "Vertex 4 is not reachable from any vertex so the path must be empty");
-
-        src = 6;
-        mooreMachine.BFS(src);
-        assertTrue(mooreMachine.getVertexColor(src) == Vertex.Color.BLACK);
-        assertTrue(mooreMachine.getVertexColor((char) 3) == Vertex.Color.BLACK);
-        assertTrue(mooreMachine.getVertexColor((char) 5) == Vertex.Color.BLACK);
-        assertTrue(mooreMachine.getVertexColor((char) 2) == Vertex.Color.BLACK);
-        assertTrue(mooreMachine.getVertexColor((char) 7) == Vertex.Color.BLACK);
-        assertTrue(mooreMachine.getVertexColor((char) 8) == Vertex.Color.BLACK);
-        assertTrue(mooreMachine.getVertexColor((char) 6) == Vertex.Color.BLACK);
-        assertTrue(mooreMachine.getVertexColor((char) 4) == Vertex.Color.WHITE);
-        leastStopsPath = mooreMachine.getSingleSourcePath((char) 5);
-        assertTrue(leastStopsPath.get(0) == src && mooreMachine.getLastSrc() == src, "Source is not the expected");
-        assertTrue(leastStopsPath.get(1) == 1, "It is not the least stops path");
-        assertTrue(leastStopsPath.get(2) == 2, "It is not the least stops path");
-        assertTrue(leastStopsPath.get(3) == 8, "It is not the least stops path");
-        assertTrue(leastStopsPath.get(4) == 5, "It is not the least stops path");
-
-        leastStopsPath = mooreMachine.getSingleSourcePath((char) 3);
-        assertTrue(leastStopsPath.get(0) == src && mooreMachine.getLastSrc() == src, "Source is not the expected");
-        assertTrue(leastStopsPath.get(1) == 1, "It is not the least stops path");
-        assertTrue(leastStopsPath.get(2) == 2, "It is not the least stops path");
-        assertTrue(leastStopsPath.get(3) == 3, "It is not the least stops path");
-    }
-
-    @Test
-    public void deleteVertexTest() {
-        relateStatesTest();
-        int orderBeforeDeletion = mooreMachine.getOrder();
-        assertFalse(mooreMachine.deleteVertex((char) 100), "There is not a vertex with key 100 in the graph");
-        assertTrue(mooreMachine.deleteVertex((char) 8), "The vertex should have been deleted");
-        assertFalse(mooreMachine.containsVertex((char) 8), "The vertex should have been deleted");
-        assertTrue(orderBeforeDeletion == mooreMachine.getOrder() + 1, "The order after insertion should be a unit less");
-        removedEdges = new ArrayList<>();
-        removedEdges.add(new Edge<Integer>(2, 8, Integer.MAX_VALUE));
-        removedEdges.add(new Edge<Integer>(8, 3, Integer.MAX_VALUE));
-        removedEdges.add(new Edge<Integer>(8, 5, Integer.MAX_VALUE));
-        removedEdges.add(new Edge<Integer>(5, 8, Integer.MAX_VALUE));
     }
 
     private void stateInsertionLoop() {

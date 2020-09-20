@@ -3,6 +3,7 @@ package ui;
 import dataStructures.AdjacencyListGraph;
 import model.MooreMachine;
 
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class DesktopTest {

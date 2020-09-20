@@ -5,17 +5,17 @@ import dataStructures.Vertex;
 import java.util.*;
 
 public class MooreMachine<Q, S, R> extends Automaton<Q, S, R> {
-    private HashMap<Q, R> responses;
+    private HashMap<Q, R> responsesH;
 
     public MooreMachine(Q initialState, R responseForInitialState) {
         super(initialState);
-        responses = new HashMap<>();
+        responsesH = new HashMap<>();
         insertState(initialState, responseForInitialState);
     }
 
     public boolean insertState(Q state, R response) {
-        if (!responses.containsKey(state)) {
-            responses.put(state, response);
+        if (!responsesH.containsKey(state)) {
+            responsesH.put(state, response);
             insertVertex(state);
             getResponsesSet().add(response);
             return true;
@@ -24,7 +24,7 @@ public class MooreMachine<Q, S, R> extends Automaton<Q, S, R> {
     }
 
     public R getResponse(Q q) {
-        return responses.get(q);
+        return responsesH.get(q);
     }
 
     @Override
@@ -70,7 +70,7 @@ public class MooreMachine<Q, S, R> extends Automaton<Q, S, R> {
         //steps two and three
         boolean previousEqualsCurrent = false;
         while (!previousEqualsCurrent) {
-            previousPartitions = (ArrayList<ArrayList<Q>>) originPartitions.clone();
+            previousPartitions = originPartitions;
             for (S s : getStimuliSet()) {
                 //Partition the original set of partitions using stimulus s
                 HashMap<Integer, HashMap<Integer, ArrayList<Q>>> originPartitioned = new HashMap<>();
@@ -85,7 +85,6 @@ public class MooreMachine<Q, S, R> extends Automaton<Q, S, R> {
                     /* Pk was actually partitioned.
                      * Replace the previous partition with the current one and fill the new "origin" with the last resulting partition
                      * */
-                    previousPartitions = originPartitions;
                     originPartitions = new ArrayList<>();
                     for (int i = 0; i < originPartitioned.size(); i++) {
                         for (ArrayList<Q> parts : originPartitioned.get(i).values()) {
