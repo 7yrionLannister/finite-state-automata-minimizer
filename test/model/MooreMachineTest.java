@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class MooreMachineTest {
-    private MooreMachine<Character,Boolean, Boolean> mooreMachine;
+    private MooreMachine<Character, Boolean, Boolean> mooreMachine;
     private ArrayList<Edge<Integer>> removedEdges;
 
     private void setupStage1() {
@@ -76,10 +76,10 @@ public class MooreMachineTest {
         mooreMachine.relate('F', 'B', false);
         mooreMachine.relate('F', 'F', true);
     }
-    
+
     private void setupStageGraphWithIsolatedVertices() {
         for (int i = 0; i < 8; i++) {
-            mooreMachine.insertState((char)(i + 1), (Math.random() * 10) % 2 == 0);
+            mooreMachine.insertState((char) (i + 1), (Math.random() * 10) % 2 == 0);
         }
     }
 
@@ -198,7 +198,7 @@ public class MooreMachineTest {
         assertTrue(leastStopsPath.get(2) == 2, "It is not the least stops path");
         assertTrue(leastStopsPath.get(3) == 3, "It is not the least stops path");
     }
-    
+
     @Test
     public void deleteVertexTest() {
         relateStatesTest();
@@ -234,6 +234,14 @@ public class MooreMachineTest {
         setupStageM1();
         mooreMachine = mooreMachine.minimize();
         assertEquals(6, mooreMachine.getOrder(), "The number of states of the minimized machine is incorrect");
+        char initialState = mooreMachine.getInitialState();
+        mooreMachine.BFS(initialState); // It allows to know whether or not there are inaccessible states
+        ArrayList<Character> states = mooreMachine.getVertices();
+        for (int i = 0; i < states.size(); i++) {
+            char state = states.get(i);
+            assertTrue(mooreMachine.getVertexColor(state) == Vertex.Color.BLACK, "There should not be any inaccessible state starting processing from the initial state");
+        }
+
         System.out.println(mooreMachine.stateTransitionFunction('A', false));
         System.out.println(mooreMachine.stateTransitionFunction('A', true));
         System.out.println(mooreMachine.getOrder());
