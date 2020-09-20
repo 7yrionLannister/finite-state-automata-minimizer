@@ -30,7 +30,6 @@ public abstract class Automaton<Q, S, R> extends AdjacencyListGraph<Q> {
             f.put(src, new HashMap<>());
         }
         if (!f.get(src).containsKey(stimulus) && containsVertex(src) && containsVertex(dst)) {
-            System.out.println("relating");
             super.link(src, dst, 1);
             f.get(src).put(stimulus, dst);
             stimuliSet.add(stimulus);

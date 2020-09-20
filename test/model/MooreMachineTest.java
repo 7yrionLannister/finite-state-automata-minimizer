@@ -233,6 +233,6 @@ public class MooreMachineTest {
     public void minimizeTest() {
         setupStageM1();
         System.out.println(mooreMachine.stateTransitionFunction('A', false));
-        //mooreMachine.minimize();
+        mooreMachine.minimize();
     }
 }

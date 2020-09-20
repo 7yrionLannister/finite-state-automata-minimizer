@@ -1,8 +1,6 @@
 package model;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.*;
 
 public class MooreMachine<Q, S, R> extends Automaton<Q, S, R> {
     private HashMap<Q, R> responses;
@@ -68,9 +66,11 @@ public class MooreMachine<Q, S, R> extends Automaton<Q, S, R> {
                     previousPartitions = originPartitions;
                     originPartitions = new ArrayList<>();
                     for(int i = 0; i < originPartitioned.size(); i++) {
-                        HashMap<Integer, ArrayList<Q>> parts = originPartitioned.get(i);
-                        for(int j = 0; j < parts.size(); j++)
-                        originPartitions.add(parts.get(j));
+                        System.out.println("Parsing " + i);
+                        for(ArrayList<Q> parts : originPartitioned.get(i).values()) {
+                            System.out.println(parts + "*");
+                            originPartitions.add(parts);
+                        }
                     }
                     break;
                 }
