@@ -23,6 +23,10 @@ public abstract class Automaton<Q, S, R> extends AdjacencyListGraph<Q> {
         q0 = initialState;
         insertVertex(q0);
     }
+    public Automaton(){
+        super(true);
+    }
+
 
     /** It allows you to insert a transition given the ends of the transition and a stimulus
      * @param src The source of the transition. src != null
