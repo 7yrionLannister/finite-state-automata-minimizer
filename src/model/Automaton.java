@@ -13,8 +13,7 @@ public abstract class Automaton<Q, S, R> extends AdjacencyListGraph<Q> {
     private Q q0;
     private Q currentState;
 
-    /**
-     * The vertices of the graph compose the set of states
+    /** The vertices of the graph compose the set of states
      */
     public Automaton(Q initialState) {
         super(true);
@@ -25,11 +24,17 @@ public abstract class Automaton<Q, S, R> extends AdjacencyListGraph<Q> {
         insertVertex(q0);
     }
 
+    /** It allows you to insert a transition given the ends of the transition and a stimulus
+     * @param src The source of the transition. src != null
+     * @param dst The destiny or end of the transition. dst != null
+     * @param stimulus The stimulus that leads to this transition. stimulus != null
+     * @return A boolean representing whether or not the transition was added
+     * */
     public boolean relate(Q src, Q dst, S stimulus) {
         if (!f.containsKey(src)) {
             f.put(src, new HashMap<>());
         }
-        if (!f.get(src).containsKey(stimulus) && containsVertex(src) && containsVertex(dst)) {
+        if (!f.get(src).containsKey(stimulus) && containsVertex(src) && containsVertex(dst) && stimulus != null) {
             super.link(src, dst, 1);
             f.get(src).put(stimulus, dst);
             stimuliSet.add(stimulus);
@@ -44,6 +49,9 @@ public abstract class Automaton<Q, S, R> extends AdjacencyListGraph<Q> {
         return false;
     }
 
+    /** Get the result q of F(Q,S)
+     * @return The state mapped by the F function for the pair Q,S or null if there is not such mapping
+     * */
     public Q stateTransitionFunction(Q current, S stimulus) {
         if (f.containsKey(current)) {
             return f.get(current).get(stimulus);
@@ -51,14 +59,23 @@ public abstract class Automaton<Q, S, R> extends AdjacencyListGraph<Q> {
         return null;
     }
 
+    /** Get the response alphabet of the automaton
+     * @return A set containing all the responses the automaton can return when it processes an input string
+     * */
     public HashSet<R> getResponsesSet() {
         return responsesSet;
     }
 
+    /** Get the stimuli alphabet of the automaton
+     * @return A set containing all the stimuli associated with the transitions of the automaton
+     * */
     public HashSet<S> getStimuliSet() {
         return stimuliSet;
     }
 
+    /** Get the initial state q0 of the automaton, that is, the state where any input starts to be processed
+     * @return The initial state
+     * */
     public Q getInitialState() {
         return q0;
     }
@@ -69,5 +86,8 @@ public abstract class Automaton<Q, S, R> extends AdjacencyListGraph<Q> {
         return false;
     }
 
+    /** Minimize the automaton without modifying it and return the result
+     * @return  An equivalent automaton without unnecessary states and transitions
+     * */
     public abstract Automaton<Q, S, R> minimize();
 }

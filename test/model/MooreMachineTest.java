@@ -232,7 +232,13 @@ public class MooreMachineTest {
     @Test
     public void minimizeTest() {
         setupStageM1();
+        mooreMachine = mooreMachine.minimize();
+        assertEquals(6, mooreMachine.getOrder(), "The number of states of the minimized machine is incorrect");
         System.out.println(mooreMachine.stateTransitionFunction('A', false));
-        mooreMachine.minimize();
+        System.out.println(mooreMachine.stateTransitionFunction('A', true));
+        System.out.println(mooreMachine.getOrder());
+        System.out.println(mooreMachine.getStimuliSet());
+        System.out.println(mooreMachine.getResponsesSet());
+        System.out.println(mooreMachine.getVertices());
     }
 }
