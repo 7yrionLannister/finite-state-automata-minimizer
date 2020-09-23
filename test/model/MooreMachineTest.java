@@ -168,12 +168,5 @@ public class MooreMachineTest {
             char state = states.get(i);
             assertTrue(mooreMachine.getVertexColor(state) == Vertex.Color.BLACK, "There should not be any inaccessible state starting processing from the initial state");
         }
-
-        System.out.println(mooreMachine.stateTransitionFunction('A', false));
-        System.out.println(mooreMachine.stateTransitionFunction('A', true));
-        System.out.println(mooreMachine.getOrder());
-        System.out.println(mooreMachine.getStimuliSet());
-        System.out.println(mooreMachine.getResponsesSet());
-        System.out.println(mooreMachine.getVertices());
     }
 }

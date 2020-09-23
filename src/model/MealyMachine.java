@@ -14,6 +14,9 @@ public class MealyMachine<Q, S, R> extends Automaton<Q, S, R> {
     }
 
     public boolean insertState(Q state) {
+        if(state == null) {
+            return false;
+        }
         return insertVertex(state);
     }
 
@@ -42,19 +45,37 @@ public class MealyMachine<Q, S, R> extends Automaton<Q, S, R> {
         BFS(getInitialState());
         ArrayList<ArrayList<Q>> originPartitions = partitioningAlgorithm();
 
-        return this;
+        /* Create the minimized automaton and return it
+         * newState is the new label for the state represented by a partition
+         * */
+        Q newState = originPartitions.get(0).get(0);
+        MealyMachine<Q, S, R> minimized = new MealyMachine<>(newState);
+        //insert states
+        for (int i = 1; i < originPartitions.size(); i++) {
+            newState = originPartitions.get(i).get(0);
+            minimized.insertState(newState);
+        }
+        //relate states
+        for (Q src : minimized.getVertices()) {
+            for (S s : getStimuliSet()) {
+                Q dst = stateTransitionFunction(src, s);
+                R rsp = getResponse(src, s);
+                boolean related = false;
+                for (int i = 0; i < originPartitions.size() && !related; i++) {
+                    ArrayList<Q> p = originPartitions.get(i);
+                    if (p.contains(dst)) {
+                        minimized.relate(src, p.get(0), s, rsp);
+                        related = true;
+                    }
+                }
+            }
+        }
+        return minimized;
     }
 
     private ArrayList<ArrayList<Q>> partitioningAlgorithm() {
         ArrayList<ArrayList<Q>> originPartitions = stepOneOfPartitioningAlgorithm();
-        for(ArrayList<Q> arrayList : originPartitions) {
-            String line = "";
-            for(Q q : arrayList) {
-                line += q+ " ";
-            }
-            System.out.println(line);
-        }
-        return originPartitions;
+        return super.stepsTwoAndThreeOfPartitioningAlgorithm(originPartitions);
     }
 
     private ArrayList<ArrayList<Q>> stepOneOfPartitioningAlgorithm() {
@@ -80,9 +101,5 @@ public class MealyMachine<Q, S, R> extends Automaton<Q, S, R> {
             originPartitions.get(responseToIndex.get(responsesForStateQ)).add(q);
         }
         return originPartitions;
-    }
-
-    private void refineSubset() {
-
     }
 }

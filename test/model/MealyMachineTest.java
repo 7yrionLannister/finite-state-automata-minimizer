@@ -127,7 +127,7 @@ public class MealyMachineTest {
     public void minimizeTest() {
         setupStageM1();
         mealyMachine = mealyMachine.minimize();
-        //assertEquals(4, mealyMachine.getOrder(), "The number of states of the minimized machine is incorrect");
+        assertEquals(4, mealyMachine.getOrder(), "The number of states of the minimized machine is incorrect");
         char initialState = mealyMachine.getInitialState();
         mealyMachine.BFS(initialState); // It allows to know whether or not there are inaccessible states
         ArrayList<Character> states = mealyMachine.getVertices();
@@ -135,14 +135,5 @@ public class MealyMachineTest {
             char state = states.get(i);
             assertTrue(mealyMachine.getVertexColor(state) == Vertex.Color.BLACK, "There should not be any inaccessible state starting processing from the initial state");
         }
-
-        System.out.println(mealyMachine.stateTransitionFunction('A', false));
-        System.out.println(mealyMachine.getResponse('A', false));
-        System.out.println(mealyMachine.stateTransitionFunction('A', true));
-        System.out.println(mealyMachine.getResponse('A', true));
-        System.out.println(mealyMachine.getOrder());
-        System.out.println(mealyMachine.getStimuliSet());
-        System.out.println(mealyMachine.getResponsesSet());
-        System.out.println(mealyMachine.getVertices());
     }
 }
