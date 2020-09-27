@@ -47,7 +47,7 @@ public class MooreMachine<Q, S, R> extends Automaton<Q, S, R> {
     }
 
     /**
-     * This function minimizes moore's machine
+     * This function minimizes moore machine
      * @return  moore machine minimized
      */
     @Override
