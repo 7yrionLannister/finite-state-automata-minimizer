@@ -6,6 +6,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import model.Automaton;
+import model.MooreMachine;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +32,10 @@ public class Controller {
     private GridPane gridP2;
     private GridPane gpQ;
     private List<TextField> listTextField;
+    private int rows;
+    private int column;
+    private TextField[][] tf;
+    private String[] arrStimulus;
     @FXML
     public void initialize() {
         listTextField = new ArrayList<>();
@@ -39,11 +44,12 @@ public class Controller {
 
     @FXML
     void generate(ActionEvent event) {
-        int rows = Integer.parseInt(nStates.getText());
-        String[] arrStimulus = stimulus.getText().split(",");
-        int colums = arrStimulus.length;
+        rows = Integer.parseInt(nStates.getText());
+        arrStimulus = stimulus.getText().split(",");
+        column = arrStimulus.length;
         if(rows<=26) {
             if (typeMachine.getValue().equals("MOORE")) {
+
                 HBox hb= new HBox();
 
 
@@ -77,7 +83,8 @@ public class Controller {
 
                 try {
                     String[][] b= createQForMoore(rows);
-                    String[][] a = new String[colums+1][rows];
+                    String[][] a = new String[column+1][rows];
+                    tf = new TextField[column+1][rows];
                     for (int i = 0; i < b.length; i++) {
                         for (int j = 0; j < b[0].length; j++) {
                             Label lRow = new Label(b[i][j]);
@@ -89,12 +96,14 @@ public class Controller {
                         for (int j = 0; j < a[0].length; j++) {
 
                             TextField ta = new TextField(a[i][j]);
-                            ta.setPrefWidth(10);
+                            //ta.setPrefWidth(15);
+                            //ta.setStyle("#0000");
+                            tf[i][j]=ta;
                             listTextField.add(ta);
                             gridP1.add(ta, i , j);
                         }
                     }
-                    readMoore(a);
+
 
                 } catch (NegativeArraySizeException | IllegalArgumentException e) {
                     Alert a = new Alert(Alert.AlertType.ERROR);
@@ -110,17 +119,36 @@ public class Controller {
             a.show();
         }
     }
+    @FXML
+    public void readMachine(ActionEvent event) {
+        readMoore(tf,column+1,rows);
+    }
 
-    public void readMoore(String[][] moore){
-        String[][] matrix= new String[moore.length][moore[0].length];
+    public void readMoore(TextField[][] moore, int colums, int rows){
+        String[][] matrix= new String[colums][rows];
         for (int i = 0; i < matrix.length; i++) {
             for (int j = 0; j < matrix[0].length ; j++) {
-                matrix[i][j]=moore[i][j];
+                matrix[i][j]=moore[i][j].getText();
             }
         }
 
-        //return matrix;
+       MooreMachine<Character, Character, Character> mooreMachine = new MooreMachine<Character, Character, Character>('A', (matrix[matrix.length-1][0].charAt(0)));
+
+        for (int i = 0; i < matrix.length-1; i++) {
+            for (int j = 0; j < matrix[0].length ; j++) {
+                char temp= (char)(j+65);
+                mooreMachine.insertState(temp, matrix[matrix.length-1][j].charAt(0));
+                mooreMachine.relate(temp, matrix[i][j].charAt(0), arrStimulus[i].charAt(0));
+            }
+        }
+        mooreMachine = mooreMachine.minimize();
+        Alert a = new Alert(Alert.AlertType.INFORMATION);
+        a.setContentText("Se minimizo");
+        a.show();
+        int tamano = mooreMachine.getOrder();
+        
     }
+
 
     public String[][] createQForMoore(int nstate){
         String[][] matrix= new String[nstate][1];
