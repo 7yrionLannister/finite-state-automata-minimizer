@@ -7,20 +7,22 @@ import java.util.HashMap;
 
 public class MealyMachine<Q, S, R> extends Automaton<Q, S, R> {
     /**
-     * The responsesH represents the initial state of the machine and the response of the initial state
+     * This is the G function of the Moore machine that tells the response for a given state when it receives a certain stimulus
      */
     private HashMap<Q, HashMap<S, R>> responsesG;
+
     /**
-     * This function initializes a new Mealy Machine
-     * @param initialState the initial state of the machine
+     * This function initializes a new Mealy Machine given the initial state
+     * @param initialState The initial state of the machine
      */
     public MealyMachine(Q initialState) {
         super(initialState);
         responsesG = new HashMap<>();
     }
+
     /**
      * This function records more states to the machine
-     * @param state the state of the machine
+     * @param state the new state for the machine
      * @return true or false if the recorded data is according to the initial conditions
      */
     public boolean insertState(Q state) {
@@ -29,11 +31,11 @@ public class MealyMachine<Q, S, R> extends Automaton<Q, S, R> {
         }
         return insertVertex(state);
     }
-    /**
-     * Returns the responses of a state
-     * @param q state of the machine
-     * @param s stimuli of the machine
-     * @return the response of that already created state
+
+    /** Returns the result of giving the specified state q and stimulus s to the G function
+     * @param q A state of the machine
+     * @param s A stimuli
+     * @return The response for the given inputs
      */
     public R getResponse(Q q, S s) {
         if(responsesG.containsKey(q)) {
@@ -42,8 +44,8 @@ public class MealyMachine<Q, S, R> extends Automaton<Q, S, R> {
         return null;
     }
 
-    /**
-     * This function relates the states from the origin to the destination according to the stimuli and responses already defined
+    /** The function relates the states from the origin to the destination according to the stimuli and responses already defined.
+     * See relate function in Automaton class
      * @param src origin of machine status
      * @param dst machine status destination
      * @param stimulus stimuli that the machine will have
@@ -61,9 +63,9 @@ public class MealyMachine<Q, S, R> extends Automaton<Q, S, R> {
         }
         return related;
     }
-    /**
-     * This function minimizes meyaly machine
-     * @return  moore machine minimized
+
+    /** The function minimizes Mealy machine
+     * @return The equivalent minimized automaton
      */
     @Override
     public MealyMachine<Q, S, R> minimize() {
@@ -98,17 +100,17 @@ public class MealyMachine<Q, S, R> extends Automaton<Q, S, R> {
         }
         return minimized;
     }
-    /**
-     * this function makes the partitioning on the automaton
-     * @return moore's machine partitions list
+
+    /** The function makes the partitioning on the automaton
+     * @return A list of lists states, each list of states is a partition in the resulting set of partitions Pk
      */
     private ArrayList<ArrayList<Q>> partitioningAlgorithm() {
         ArrayList<ArrayList<Q>> originPartitions = stepOneOfPartitioningAlgorithm();
         return super.stepsTwoAndThreeOfPartitioningAlgorithm(originPartitions);
     }
-    /**
-     * This function removes all states are not accessible from the initial state
-     * @return a list the equivalent connected automaton
+
+    /** The function performs the step one in the partitioning algorithm for a Mealy machine ignoring inaccessible(WHITE) states
+     * @return A list with the initial partition P1 of the automaton
      */
     private ArrayList<ArrayList<Q>> stepOneOfPartitioningAlgorithm() {
         ArrayList<ArrayList<Q>> originPartitions = new ArrayList<>();

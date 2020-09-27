@@ -6,14 +6,14 @@ import java.util.*;
 
 public class MooreMachine<Q, S, R> extends Automaton<Q, S, R> {
     /**
-     * The responsesH represents the initial state of the machine and the response of the initial state
+     * This is the H function of the Moore machine that tells the response for a given state
      */
     private HashMap<Q, R> responsesH;
 
     /**
      * This function initializes a new Moore Machine
-     * @param initialState the initial state of the machine
-     * @param responseForInitialState the defined response of the initial state of the machine
+     * @param initialState The initial state of the machine
+     * @param responseForInitialState The response for the initial state of the machine
      */
     public MooreMachine(Q initialState, R responseForInitialState) {
         super(initialState);
@@ -21,11 +21,10 @@ public class MooreMachine<Q, S, R> extends Automaton<Q, S, R> {
         insertState(initialState, responseForInitialState);
     }
 
-    /**
-     * This function records more states to the machine
-     * @param state the state of the machine
-     * @param response the defined response of the state of the machine
-     * @return true or false if the recorded data is according to the initial conditions
+    /** The function records more states to the machine
+     * @param state The new state for the machine
+     * @param response The response associated to state
+     * @return A boolean telling whether or not the state was inserted successfully
      */
     public boolean insertState(Q state, R response) {
         if (state != null && !responsesH.containsKey(state)) {
@@ -38,9 +37,9 @@ public class MooreMachine<Q, S, R> extends Automaton<Q, S, R> {
     }
 
     /**
-     * Returns the responses of a state
-     * @param q state of the machine
-     * @return the response of that already created state
+     * The result of giving the specified state as input to the H function
+     * @param q A state of the machine
+     * @return The response associated with state q
      */
     public R getResponse(Q q) {
         return responsesH.get(q);
@@ -48,7 +47,7 @@ public class MooreMachine<Q, S, R> extends Automaton<Q, S, R> {
 
     /**
      * This function minimizes moore machine
-     * @return  moore machine minimized
+     * @return  The equivalent minimized automaton
      */
     @Override
     public MooreMachine<Q, S, R> minimize() {
@@ -83,18 +82,16 @@ public class MooreMachine<Q, S, R> extends Automaton<Q, S, R> {
         return minimized;
     }
 
-    /**
-     * this function makes the partitioning on the automaton
-     * @return moore's machine partitions list
-     */
+    /** Perform the partitioning algorithm version for a Moore machine
+     * @return The result of the partitioning algorithm; a set of refinements of the original automaton
+     * */
     private ArrayList<ArrayList<Q>> partitioningAlgorithm() {
         ArrayList<ArrayList<Q>> originPartitions = stepOneOfPartitioningAlgorithm();
         return super.stepsTwoAndThreeOfPartitioningAlgorithm(originPartitions);
     }
 
-    /**
-     * This function removes all states are not accessible from the initial state
-     * @return a list the equivalent connected automaton
+    /** The function performs the step one in the partitioning algorithm for a Moore machine ignoring inaccessible(WHITE) states
+     * @return A list with the initial partition P1 of the automaton
      */
     private ArrayList<ArrayList<Q>> stepOneOfPartitioningAlgorithm() {
         ArrayList<ArrayList<Q>> originPartitions = new ArrayList<>();

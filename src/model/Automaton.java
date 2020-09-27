@@ -8,28 +8,24 @@ import java.util.HashSet;
 
 public abstract class Automaton<Q, S, R> extends AdjacencyListGraph<Q> {
     /**
-     * The stimuliSet represents the set of stimuli of the automaton
+     * The stimuliSet represents the set of stimuli the automaton recognizes
      */
     private HashSet<S> stimuliSet;
     /**
-     * The responsesSet represents the set of the responses of the automaton
+     * The responsesSet represents the set of the responses the automaton can retrieve
      */
     private HashSet<R> responsesSet;
     /**
-     * The f represents a transition function
+     * f is the state transition function that tells where the automaton goes when in a certain state and receives a certain stimulus
      */
     private HashMap<Q, HashMap<S, Q>> f;
     /**
-     * The q0 represents the initial state 0 of the automata
+     * q0 represents the initial state 0 of the automaton
      */
     private Q q0;
-    /**
-     * The currentState represents the
-     */
-    private Q currentState;
 
-    /**
-     * The vertices of the graph compose the set of states
+    /** The method initializes the Automaton given the initial state
+     * @param initialState The initial state for the automaton
      */
     public Automaton(Q initialState) {
         super(true);
@@ -107,7 +103,7 @@ public abstract class Automaton<Q, S, R> extends AdjacencyListGraph<Q> {
      * */
     public abstract Automaton<Q, S, R> minimize();
 
-    /** Perform the partitioning algorithm version for a Moore machine
+    /** Performs steps two and three of the partitioning algorithm for any automaton
      * @return The result of the partitioning algorithm; a set of refinements of the original automaton
      * */
     public ArrayList<ArrayList<Q>> stepsTwoAndThreeOfPartitioningAlgorithm(ArrayList<ArrayList<Q>> originPartitions) {
@@ -146,8 +142,7 @@ public abstract class Automaton<Q, S, R> extends AdjacencyListGraph<Q> {
         return originPartitions;
     }
 
-    /**
-     * The method allows to refine a particular target subset of a set of partitions taking into account a stimulus s
+    /** The method allows to refine a particular target subset of a set of partitions taking into account a stimulus s
      *
      * @param originalPartition The original partition Pk
      * @param targetSubset      The index of the subset to be refined
