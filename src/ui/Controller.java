@@ -1,6 +1,5 @@
 package ui;
 
-import com.sun.xml.internal.bind.v2.runtime.output.StAXExStreamWriterOutput;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -9,7 +8,6 @@ import model.Automaton;
 import model.MooreMachine;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class Controller {
 
@@ -30,33 +28,28 @@ public class Controller {
     private GridPane gridP1;
 
     private GridPane gridP2;
-    private GridPane gpQ;
-    private List<TextField> listTextField;
     private int rows;
-    private int column;
+    private int columns;
     private TextField[][] tf;
     private String[] arrStimulus;
+
     @FXML
     public void initialize() {
-        listTextField = new ArrayList<>();
         typeMachine.getItems().addAll("MOORE", "MEALY");
     }
 
     @FXML
-    void generate(ActionEvent event) {
+    public void generate(ActionEvent event) {
         rows = Integer.parseInt(nStates.getText());
         arrStimulus = stimulus.getText().split(",");
-        column = arrStimulus.length;
-        if(rows<=26) {
+        columns = arrStimulus.length;
+        if (rows <= 26) {
             if (typeMachine.getValue().equals("MOORE")) {
 
-                HBox hb= new HBox();
-
+                HBox hb = new HBox();
 
                 gridP1 = new GridPane();
                 gridP2 = new GridPane();
-                gpQ = new GridPane();
-                hb.getChildren().add(gpQ);
                 hb.getChildren().add(scrollP1);
 
                 GridPane gpS = new GridPane();
@@ -64,47 +57,37 @@ public class Controller {
                 gridP1.setHgap(3);
                 gridP1.setVgap(3);
 
-                gpQ.setHgap(3);
-                gpQ.setVgap(3);
-
                 gpS.setHgap(3);
                 gpS.setVgap(3);
 
                 gridP2.setHgap(3);
                 gridP2.setVgap(3);
 
-                gridP2.getChildren().add(gpQ);
-
-
                 scrollP1.setContent(gridP1);
-                scrollP2.setContent(gpQ);
+                scrollP2.setContent(gridP2);
                 vboxG.getChildren().add(gpS);
                 vboxG.getChildren().add(hb);
 
                 try {
-                    String[][] b= createQForMoore(rows);
-                    String[][] a = new String[column+1][rows];
-                    tf = new TextField[column+1][rows];
-                    for (int i = 0; i < b.length; i++) {
-                        for (int j = 0; j < b[0].length; j++) {
-                            Label lRow = new Label(b[i][j]);
-                            gpQ.add(lRow, j,i);
-                        }
+                    tf = new TextField[columns + 1][rows];
+
+                    for (int i = 1; i < columns + 1; i++) {
+                        TextField ta = new TextField(arrStimulus[i - 1]);
+                        ta.setEditable(false);
+                        gridP1.add(ta, i, 0);
                     }
-
-                    for (int i = 0; i < a.length; i++) {
-                        for (int j = 0; j < a[0].length; j++) {
-
-                            TextField ta = new TextField(a[i][j]);
+                    for (int i = 1; i < rows + 1; i++) {
+                        TextField ta = new TextField((char) (i + 64) + "");
+                        ta.setEditable(false);
+                        gridP1.add(ta, 0, i);
+                        for (int j = 1; j < columns + 2; j++) {
+                            ta = new TextField("");
                             //ta.setPrefWidth(15);
                             //ta.setStyle("#0000");
-                            tf[i][j]=ta;
-                            listTextField.add(ta);
-                            gridP1.add(ta, i , j);
+                            tf[j - 1][i - 1] = ta;
+                            gridP1.add(ta, j, i);
                         }
                     }
-
-
                 } catch (NegativeArraySizeException | IllegalArgumentException e) {
                     Alert a = new Alert(Alert.AlertType.ERROR);
                     a.setContentText(e.getMessage());
@@ -113,52 +96,68 @@ public class Controller {
             } else if (typeMachine.getValue().equals("MEALY")) {
                 System.out.println("MEALY");
             }
-        }else{
+        } else {
             Alert a = new Alert(Alert.AlertType.ERROR);
-            a.setContentText("Digite ");
+            a.setContentText("Pruebe con menos estados");
             a.show();
         }
     }
+
     @FXML
     public void readMachine(ActionEvent event) {
-        readMoore(tf,column+1,rows);
+        readMoore(tf, columns, rows);
     }
 
-    public void readMoore(TextField[][] moore, int colums, int rows){
-        String[][] matrix= new String[colums][rows];
+    public void readMoore(TextField[][] moore, int columns, int rows) {
+        String[][] matrix = new String[columns + 1][rows];
         for (int i = 0; i < matrix.length; i++) {
-            for (int j = 0; j < matrix[0].length ; j++) {
-                matrix[i][j]=moore[i][j].getText();
+            for (int j = 0; j < matrix[0].length; j++) {
+                matrix[i][j] = moore[i][j].getText();
             }
         }
 
-       MooreMachine<Character, Character, Character> mooreMachine = new MooreMachine<Character, Character, Character>('A', (matrix[matrix.length-1][0].charAt(0)));
+        MooreMachine<Character, Character, Character> mooreMachine = new MooreMachine<Character, Character, Character>('A', matrix[matrix.length - 1][0].charAt(0));
 
-        for (int i = 0; i < matrix.length-1; i++) {
-            for (int j = 0; j < matrix[0].length ; j++) {
-                char temp= (char)(j+65);
-                mooreMachine.insertState(temp, matrix[matrix.length-1][j].charAt(0));
+        for (int j = 0; j < matrix[0].length; j++) {
+            char temp = (char) (j + 65);
+            mooreMachine.insertState(temp, matrix[matrix.length - 1][j].charAt(0));
+        }
+        for (int i = 0; i < matrix.length - 1; i++) {
+            for (int j = 0; j < matrix[0].length; j++) {
+                char temp = (char) (j + 65);
                 mooreMachine.relate(temp, matrix[i][j].charAt(0), arrStimulus[i].charAt(0));
             }
         }
+
         mooreMachine = mooreMachine.minimize();
         Alert a = new Alert(Alert.AlertType.INFORMATION);
-        a.setContentText("Se minimizo");
+        int minStates = mooreMachine.getOrder();
+        a.setContentText("El automata fue minimizado.\nAhora contiene " + minStates + " estados");
         a.show();
-        int tamano = mooreMachine.getOrder();
-        
-    }
 
-
-    public String[][] createQForMoore(int nstate){
-        String[][] matrix= new String[nstate][1];
-        for (int i = 0; i < nstate; i++) {
-            for (int j = 0; j < matrix[0].length; j++) {
-                matrix[i][j]= (char) ((char)65+(i))+"";
-            }
-
+        for (int i = 1; i < columns + 1; i++) {
+            TextField ta = new TextField(arrStimulus[i - 1]);
+            ta.setEditable(false);
+            gridP2.add(ta, i, 0);
         }
-        return matrix;
+        ArrayList<Character> minStatesList = mooreMachine.getVertices();
+        for (int i = 1; i < minStates + 1; i++) {
+            char current = minStatesList.get(i - 1);
+            TextField ta = new TextField(current + "");
+            ta.setEditable(false);
+            gridP2.add(ta, 0, i);
+            ta = new TextField("" + mooreMachine.getResponse(current));
+            ta.setEditable(false);
+            gridP2.add(ta, columns + 1, i);
+            for (int j = 1; j < columns + 1; j++) {
+                ta = new TextField("" + mooreMachine.stateTransitionFunction(current, arrStimulus[j - 1].charAt(0)));
+                System.out.println(current + ":" + mooreMachine.getResponse(current) + "--" + arrStimulus[j - 1] + "-->" + ta.getText());
+                ta.setEditable(false);
+                //ta.setPrefWidth(15);
+                //ta.setStyle("#0000");
+                tf[j - 1][i - 1] = ta;
+                gridP2.add(ta, j, i);
+            }
+        }
     }
-
 }
