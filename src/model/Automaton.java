@@ -7,13 +7,27 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 public abstract class Automaton<Q, S, R> extends AdjacencyListGraph<Q> {
+    /**
+     * The stimuliSet represents the set of stimuli of the automaton
+     */
     private HashSet<S> stimuliSet;
+    /**
+     * The responsesSet represents the set of the responses of the automaton
+     */
     private HashSet<R> responsesSet;
+
     private HashMap<Q, HashMap<S, Q>> f;
+    /**
+     * The q0 represents the initial state 0 of the automata
+     */
     private Q q0;
+    /**
+     * The currentState represents the
+     */
     private Q currentState;
 
-    /** The vertices of the graph compose the set of states
+    /**
+     * The vertices of the graph compose the set of states
      */
     public Automaton(Q initialState) {
         super(true);

@@ -5,14 +5,28 @@ import dataStructures.Vertex;
 import java.util.*;
 
 public class MooreMachine<Q, S, R> extends Automaton<Q, S, R> {
+    /**
+     * The responsesH represents the initial state of the machine and the response of the initial state
+     */
     private HashMap<Q, R> responsesH;
 
+    /**
+     * This function initializes a new Moore Machine
+     * @param initialState the initial state of the machine
+     * @param responseForInitialState the defined response of the initial state of the machine
+     */
     public MooreMachine(Q initialState, R responseForInitialState) {
         super(initialState);
         responsesH = new HashMap<>();
         insertState(initialState, responseForInitialState);
     }
 
+    /**
+     * This function records more states to the machine
+     * @param state the state of the machine
+     * @param response the defined response of the state of the machine
+     * @return true or false if the recorded data is according to the initial conditions
+     */
     public boolean insertState(Q state, R response) {
         if (state != null && !responsesH.containsKey(state)) {
             responsesH.put(state, response);
@@ -23,10 +37,19 @@ public class MooreMachine<Q, S, R> extends Automaton<Q, S, R> {
         return false;
     }
 
+    /**
+     * Returns the responses of a state
+     * @param q state of the machine
+     * @return the response of that already created state
+     */
     public R getResponse(Q q) {
         return responsesH.get(q);
     }
 
+    /**
+     * This function minimizes moore's machine
+     * @return  moore machine minimized
+     */
     @Override
     public MooreMachine<Q, S, R> minimize() {
         //do a BFS traversal starting from the initial state q0 in order to discard inaccessible states
@@ -60,11 +83,19 @@ public class MooreMachine<Q, S, R> extends Automaton<Q, S, R> {
         return minimized;
     }
 
+    /**
+     * this function makes the partitioning on the automaton
+     * @return moore's machine partitions list
+     */
     private ArrayList<ArrayList<Q>> partitioningAlgorithm() {
         ArrayList<ArrayList<Q>> originPartitions = stepOneOfPartitioningAlgorithm();
         return super.stepsTwoAndThreeOfPartitioningAlgorithm(originPartitions);
     }
 
+    /**
+     * This function removes all states are not accessible from the initial state
+     * @return a list the equivalent connected automaton
+     */
     private ArrayList<ArrayList<Q>> stepOneOfPartitioningAlgorithm() {
         ArrayList<ArrayList<Q>> originPartitions = new ArrayList<>();
         HashMap<R, Integer> responseToIndex = new HashMap<>();
