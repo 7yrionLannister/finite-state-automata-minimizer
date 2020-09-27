@@ -15,7 +15,9 @@ public abstract class Automaton<Q, S, R> extends AdjacencyListGraph<Q> {
      * The responsesSet represents the set of the responses of the automaton
      */
     private HashSet<R> responsesSet;
-
+    /**
+     * The f represents a transition function
+     */
     private HashMap<Q, HashMap<S, Q>> f;
     /**
      * The q0 represents the initial state 0 of the automata
