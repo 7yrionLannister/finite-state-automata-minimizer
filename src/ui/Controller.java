@@ -13,32 +13,74 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class Controller {
-
+    /**
+     * The association with the model Automaton class.
+     */
     private Automaton au;
+    /**
+     * The TextArea asks for the number of states for the machine you want to create the user.
+     */
     @FXML
     private TextArea nStates;
+    /**
+     * The TextArea asks for the stimulus for the machine you want to create the user.
+     */
     @FXML
     private TextArea stimulus;
+    /**
+     * The ComboBox shows the user what type of machine they can choose
+     */
     @FXML
     private ComboBox<String> typeMachine;
+    /**
+     * The ScrollPane is the area where the machine is created
+     */
     @FXML
     private ScrollPane scrollP1;
+    /**
+     * The ScrollPane is the result area of the minimized automata
+     */
     @FXML
     private ScrollPane scrollP2;
-
+    /**
+     * The GridPane represents the view matrix for the machine
+     */
     private GridPane gridP1;
-
+    /**
+     * The GridPane represents the result matrix for the automaton
+     */
     private GridPane gridP2;
+
+    /**
+     * The rows represents the number of states that the machine will have
+     */
     private int rows;
+    /**
+     * The columns represents the number of stimuli that the machine will have
+     */
     private int columns;
+    /**
+     * The TextField represents the matrix of text fields that the user has to type
+     */
     private TextField[][] tf;
+    /**
+     * The arrStimulus represents the arrangement of stimuli that the user types
+     */
     private String[] arrStimulus;
 
+    /**
+     * <b>Description:</b>
+     * The initialize function of the fxml file, called as soon as the graphical interface is loaded.
+     */
     @FXML
     public void initialize() {
         typeMachine.getItems().addAll("MOORE", "MEALY");
     }
 
+    /**
+     * <b>Description:</b>
+     * this function generates the input matrix according to the conditions given by the user
+     */
     @FXML
     public void generate(ActionEvent event) {
         rows = Integer.parseInt(nStates.getText());
@@ -95,7 +137,11 @@ public class Controller {
             a.show();
         }
     }
-
+    /**
+     * <b>Description:</b>
+     * This function takes the data entered by the user to send it to the model and minimize the machine
+     * and then show it in the resulting matrix.
+     */
     @FXML
     public void minimizeMachine(Event event) {
         fillHeaders(gridP2);
@@ -105,7 +151,11 @@ public class Controller {
             readMealy();
         }
     }
-
+    /**
+     * <b>Description:</b>
+     * This function creates the relationship with the moore machine of the model,
+     * then reads the data entered by the user and records them in the machine.
+     */
     public void readMoore() {
         String[][] matrix = readTextFields("MOORE");
 
@@ -151,7 +201,11 @@ public class Controller {
             }
         }
     }
-
+    /**
+     * <b>Description:</b>
+     * This function creates the relationship with the mealy machine of the model,
+     * then reads the data entered by the user and records them in the machine.
+     */
     public void readMealy() {
         String[][] matrix = readTextFields("MEALY");
 
@@ -200,7 +254,11 @@ public class Controller {
             }
         }
     }
-
+    /**
+     * <b>Description:</b>
+     * this function places the header of the stimuli typed by the user to provide a better view to the user
+     * @param grid represents the gridpane to edit the header.
+     */
     private void fillHeaders(GridPane grid) {
         for (int i = 1; i < columns + 1; i++) {
             TextField ta = new TextField(arrStimulus[i - 1]);
