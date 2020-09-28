@@ -344,9 +344,7 @@ public class AdjacencyListGraph<E> implements IGraph<E>{
 	@Override
 	public void FloydWarshall() {
 		graphForWarshall = new AdjacencyMatrixGraph<>(getOrder(), isDirected);
-		vertices.forEach((E t, Vertex<E> u) -> {
-			graphForWarshall.insertVertex(t);
-		});
+		vertices.forEach((E t, Vertex<E> u) -> graphForWarshall.insertVertex(t));
 		adjacencyLists.forEach((E t, ArrayList<Edge<E>> u) -> {
 			for(Edge<E> ale : u) {
 				graphForWarshall.link(ale.getSrc(), ale.getDst(), ale.getWeight());
@@ -375,9 +373,7 @@ public class AdjacencyListGraph<E> implements IGraph<E>{
 	@Override
 	public ArrayList<E> getVertices() {
 		ArrayList<E> verts = new ArrayList<>();
-		vertices.forEach((E t, Vertex<E> u) -> {
-			verts.add(t);
-		});
+		vertices.forEach((E t, Vertex<E> u) -> verts.add(t));
 		return verts;
 	}
 

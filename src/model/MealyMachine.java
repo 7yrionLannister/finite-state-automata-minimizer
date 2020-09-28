@@ -9,7 +9,7 @@ public class MealyMachine<Q, S, R> extends Automaton<Q, S, R> {
     /**
      * This is the G function of the Moore machine that tells the response for a given state when it receives a certain stimulus
      */
-    private HashMap<Q, HashMap<S, R>> responsesG;
+    private final HashMap<Q, HashMap<S, R>> responsesG;
 
     /**
      * This function initializes a new Mealy Machine given the initial state
@@ -71,16 +71,16 @@ public class MealyMachine<Q, S, R> extends Automaton<Q, S, R> {
     public MealyMachine<Q, S, R> minimize() {
         //do a BFS traversal starting from the initial state q0 in order to discard inaccessible states
         BFS(getInitialState());
-        ArrayList<ArrayList<Q>> originPartitions = partitioningAlgorithm();
+        ArrayList<ArrayList<Q>> parts = partitioningAlgorithm();
 
         /* Create the minimized automaton and return it
          * newState is the new label for the state represented by a partition
          * */
-        Q newState = originPartitions.get(0).get(0);
+        Q newState = parts.get(0).get(0);
         MealyMachine<Q, S, R> minimized = new MealyMachine<>(newState);
         //insert states
-        for (int i = 1; i < originPartitions.size(); i++) {
-            newState = originPartitions.get(i).get(0);
+        for (int i = 1; i < parts.size(); i++) {
+            newState = parts.get(i).get(0);
             minimized.insertState(newState);
         }
         //relate states
@@ -89,8 +89,8 @@ public class MealyMachine<Q, S, R> extends Automaton<Q, S, R> {
                 Q dst = stateTransitionFunction(src, s);
                 R rsp = getResponse(src, s);
                 boolean related = false;
-                for (int i = 0; i < originPartitions.size() && !related; i++) {
-                    ArrayList<Q> p = originPartitions.get(i);
+                for (int i = 0; i < parts.size() && !related; i++) {
+                    ArrayList<Q> p = parts.get(i);
                     if (p.contains(dst)) {
                         minimized.relate(src, p.get(0), s, rsp);
                         related = true;
@@ -105,15 +105,15 @@ public class MealyMachine<Q, S, R> extends Automaton<Q, S, R> {
      * @return A list of lists states, each list of states is a partition in the resulting set of partitions Pk
      */
     private ArrayList<ArrayList<Q>> partitioningAlgorithm() {
-        ArrayList<ArrayList<Q>> originPartitions = stepOneOfPartitioningAlgorithm();
-        return super.stepsTwoAndThreeOfPartitioningAlgorithm(originPartitions);
+        ArrayList<ArrayList<Q>> parts = stepOneOfPartitioningAlgorithm();
+        return super.stepsTwoAndThreeOfPartitioningAlgorithm(parts);
     }
 
     /** The function performs the step one in the partitioning algorithm for a Mealy machine ignoring inaccessible(WHITE) states
      * @return A list with the initial partition P1 of the automaton
      */
     private ArrayList<ArrayList<Q>> stepOneOfPartitioningAlgorithm() {
-        ArrayList<ArrayList<Q>> originPartitions = new ArrayList<>();
+        ArrayList<ArrayList<Q>> parts = new ArrayList<>();
         HashMap<ArrayList<R>, Integer> responseToIndex = new HashMap<>();
         ArrayList<Q> statesSet = getVertices();
         int index = 0;
@@ -129,11 +129,11 @@ public class MealyMachine<Q, S, R> extends Automaton<Q, S, R> {
             }
             if (!responseToIndex.containsKey(responsesForStateQ)) {
                 responseToIndex.put(responsesForStateQ, index);
-                originPartitions.add(new ArrayList<>());
+                parts.add(new ArrayList<>());
                 index++;
             }
-            originPartitions.get(responseToIndex.get(responsesForStateQ)).add(q);
+            parts.get(responseToIndex.get(responsesForStateQ)).add(q);
         }
-        return originPartitions;
+        return parts;
     }
 }

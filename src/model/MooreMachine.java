@@ -8,7 +8,7 @@ public class MooreMachine<Q, S, R> extends Automaton<Q, S, R> {
     /**
      * This is the H function of the Moore machine that tells the response for a given state
      */
-    private HashMap<Q, R> responsesH;
+    private final HashMap<Q, R> responsesH;
 
     /**
      * This function initializes a new Moore Machine
@@ -53,16 +53,16 @@ public class MooreMachine<Q, S, R> extends Automaton<Q, S, R> {
     public MooreMachine<Q, S, R> minimize() {
         //do a BFS traversal starting from the initial state q0 in order to discard inaccessible states
         BFS(getInitialState());
-        ArrayList<ArrayList<Q>> originPartitions = partitioningAlgorithm();
+        ArrayList<ArrayList<Q>> parts = partitioningAlgorithm();
 
         /* Create the minimized automaton and return it
          * newState is the new label for the state represented by a partition
          * */
-        Q newState = originPartitions.get(0).get(0);
+        Q newState = parts.get(0).get(0);
         MooreMachine<Q, S, R> minimized = new MooreMachine<>(newState, getResponse(newState));
         //insert states
-        for (int i = 1; i < originPartitions.size(); i++) {
-            newState = originPartitions.get(i).get(0);
+        for (int i = 1; i < parts.size(); i++) {
+            newState = parts.get(i).get(0);
             minimized.insertState(newState, getResponse(newState));
         }
         //relate states
@@ -70,8 +70,8 @@ public class MooreMachine<Q, S, R> extends Automaton<Q, S, R> {
             for (S s : getStimuliSet()) {
                 Q dst = stateTransitionFunction(src, s);
                 boolean related = false;
-                for (int i = 0; i < originPartitions.size() && !related; i++) {
-                    ArrayList<Q> p = originPartitions.get(i);
+                for (int i = 0; i < parts.size() && !related; i++) {
+                    ArrayList<Q> p = parts.get(i);
                     if (p.contains(dst)) {
                         minimized.relate(src, p.get(0), s);
                         related = true;
@@ -86,15 +86,15 @@ public class MooreMachine<Q, S, R> extends Automaton<Q, S, R> {
      * @return The result of the partitioning algorithm; a set of refinements of the original automaton
      * */
     private ArrayList<ArrayList<Q>> partitioningAlgorithm() {
-        ArrayList<ArrayList<Q>> originPartitions = stepOneOfPartitioningAlgorithm();
-        return super.stepsTwoAndThreeOfPartitioningAlgorithm(originPartitions);
+        ArrayList<ArrayList<Q>> parts = stepOneOfPartitioningAlgorithm();
+        return super.stepsTwoAndThreeOfPartitioningAlgorithm(parts);
     }
 
     /** The function performs the step one in the partitioning algorithm for a Moore machine ignoring inaccessible(WHITE) states
      * @return A list with the initial partition P1 of the automaton
      */
     private ArrayList<ArrayList<Q>> stepOneOfPartitioningAlgorithm() {
-        ArrayList<ArrayList<Q>> originPartitions = new ArrayList<>();
+        ArrayList<ArrayList<Q>> parts = new ArrayList<>();
         HashMap<R, Integer> responseToIndex = new HashMap<>();
         ArrayList<Q> statesSet = getVertices();
         int index = 0;
@@ -107,11 +107,11 @@ public class MooreMachine<Q, S, R> extends Automaton<Q, S, R> {
             R r = getResponse(q);
             if (!responseToIndex.containsKey(r)) {
                 responseToIndex.put(r, index);
-                originPartitions.add(new ArrayList<>());
+                parts.add(new ArrayList<>());
                 index++;
             }
-            originPartitions.get(responseToIndex.get(r)).add(q);
+            parts.get(responseToIndex.get(r)).add(q);
         }
-        return originPartitions;
+        return parts;
     }
 }

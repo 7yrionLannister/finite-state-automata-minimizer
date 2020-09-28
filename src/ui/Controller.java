@@ -1,22 +1,15 @@
 package ui;
 
-import javafx.event.ActionEvent;
-import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
-import model.Automaton;
 import model.MealyMachine;
 import model.MooreMachine;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+
 
 public class Controller {
-    /**
-     * The association with the model Automaton class.
-     */
-    private Automaton au;
     /**
      * The TextArea asks for the number of states for the machine you want to create the user.
      */
@@ -42,10 +35,6 @@ public class Controller {
      */
     @FXML
     private ScrollPane scrollP2;
-    /**
-     * The GridPane represents the view matrix for the machine
-     */
-    private GridPane gridP1;
     /**
      * The GridPane represents the result matrix for the automaton
      */
@@ -82,22 +71,17 @@ public class Controller {
      * this function generates the input matrix according to the conditions given by the user
      */
     @FXML
-    public void generate(ActionEvent event) {
+    public void generate() {
         rows = Integer.parseInt(nStates.getText());
         arrStimulus = stimulus.getText().split(",");
         columns = arrStimulus.length;
         if (rows <= 26) {
-            gridP1 = new GridPane();
-            gridP2 = new GridPane();
+            GridPane gridP1 = new GridPane();
 
             gridP1.setHgap(3);
             gridP1.setVgap(3);
 
-            gridP2.setHgap(3);
-            gridP2.setVgap(3);
-
             scrollP1.setContent(gridP1);
-            scrollP2.setContent(gridP2);
 
             try {
                 tf = new TextField[columns + 1][rows];
@@ -120,7 +104,7 @@ public class Controller {
                     if (typeMachine.getValue().equals("MOORE")) {
                         ta = new TextField("");
                         ta.setPrefWidth(45);
-                        ta.setStyle(ta.getStyle() + "\n-fx-background-color:  rgba(70, 214, 70, 0.75)");
+                        ta.setStyle(ta.getStyle() + "\n-fx-background-color:  rgb(43,120,10)");
                         ta.setPromptText("a");
                         tf[columns][i - 1] = ta;
                         gridP1.add(ta, columns + 1, i);
@@ -133,7 +117,7 @@ public class Controller {
             }
         } else {
             Alert a = new Alert(Alert.AlertType.ERROR);
-            a.setContentText("Pruebe con menos estados");
+            a.setContentText("Although the model lets you manage many states, the GUI only supports a maximum of 26 states for visual reasons");
             a.show();
         }
     }
@@ -143,13 +127,18 @@ public class Controller {
      * and then show it in the resulting matrix.
      */
     @FXML
-    public void minimizeMachine(Event event) {
+    public void minimizeMachine() {
+        gridP2 = new GridPane();
+        gridP2.setHgap(3);
+        gridP2.setVgap(3);
+
         fillHeaders(gridP2);
         if(typeMachine.getValue().equals("MOORE")) {
             readMoore();
         } else {
             readMealy();
         }
+        scrollP2.setContent(gridP2);
     }
     /**
      * <b>Description:</b>
@@ -159,7 +148,7 @@ public class Controller {
     public void readMoore() {
         String[][] matrix = readTextFields("MOORE");
 
-        MooreMachine<Character, Character, Character> mooreMachine = new MooreMachine<Character, Character, Character>('A', matrix[matrix.length - 1][0].charAt(0));
+        MooreMachine<Character, Character, Character> mooreMachine = new MooreMachine<>('A', matrix[matrix.length - 1][0].charAt(0));
 
         for (int j = 0; j < matrix[0].length; j++) {
             char temp = (char) (j + 65);
@@ -175,17 +164,13 @@ public class Controller {
         mooreMachine = mooreMachine.minimize();
         Alert a = new Alert(Alert.AlertType.INFORMATION);
         int minStates = mooreMachine.getOrder();
-        a.setContentText("El automata de Moore fue minimizado.\nAhora contiene " + minStates + " estados");
+        a.setContentText("The Moore machine was minimized.\nThe equivalent minimized automaton contains " + minStates + " states");
         a.show();
 
         ArrayList<Character> minStatesList = mooreMachine.getVertices();
         for (int i = 1; i < minStates + 1; i++) {
-            char current = minStatesList.get(i - 1);
-            TextField ta = new TextField(current + "");
-            ta.setEditable(false);
-            ta.setPrefWidth(45);
-            ta.setStyle(ta.getStyle() + "\n-fx-background-color: rgba(125, 156, 205, 0.84)");
-            gridP2.add(ta, 0, i);
+            char current = fillGridPaneWithRepresentativeStateForTheRow(minStatesList, i);
+            TextField ta;
             ta = new TextField("" + mooreMachine.getResponse(current));
             ta.setStyle(ta.getStyle() + "\n-fx-background-color:  rgba(70, 214, 70, 0.75)");
             ta.setEditable(false);
@@ -195,12 +180,21 @@ public class Controller {
                 ta = new TextField("" + mooreMachine.stateTransitionFunction(current, arrStimulus[j - 1].charAt(0)));
                 ta.setEditable(false);
                 ta.setPrefWidth(45);
-                //ta.setStyle("#0000");
-                tf[j - 1][i - 1] = ta;
                 gridP2.add(ta, j, i);
             }
         }
     }
+
+    private char fillGridPaneWithRepresentativeStateForTheRow(ArrayList<Character> minStatesList, int i) {
+        char current = minStatesList.get(i - 1);
+        TextField ta = new TextField(current + "");
+        ta.setEditable(false);
+        ta.setPrefWidth(45);
+        ta.setStyle(ta.getStyle() + "\n-fx-background-color: rgba(125, 156, 205, 0.84)");
+        gridP2.add(ta, 0, i);
+        return current;
+    }
+
     /**
      * <b>Description:</b>
      * This function creates the relationship with the mealy machine of the model,
@@ -208,11 +202,6 @@ public class Controller {
      */
     public void readMealy() {
         String[][] matrix = readTextFields("MEALY");
-
-        for(int i = 0; i < matrix.length; i++) {
-            System.out.println(Arrays.toString(matrix[i]));
-        }
-
         MealyMachine<Character, Character, Character> mealyMachine = new MealyMachine<>('A');
 
         for (int j = 1; j < matrix[0].length; j++) {
@@ -230,17 +219,13 @@ public class Controller {
         mealyMachine = mealyMachine.minimize();
         Alert a = new Alert(Alert.AlertType.INFORMATION);
         int minStates = mealyMachine.getOrder();
-        a.setContentText("El automata de Mealy fue minimizado.\nAhora contiene " + minStates + " estados");
+        a.setContentText("The Mealy machine was minimized.\nThe equivalent minimized automaton contains " + minStates + " states");
         a.show();
 
         ArrayList<Character> minStatesList = mealyMachine.getVertices();
         for (int i = 1; i < minStates + 1; i++) {
-            char current = minStatesList.get(i - 1);
-            TextField ta = new TextField(current + "");
-            ta.setEditable(false);
-            ta.setPrefWidth(45);
-            ta.setStyle(ta.getStyle() + "\n-fx-background-color: rgba(125, 156, 205, 0.84)");
-            gridP2.add(ta, 0, i);
+            char current = fillGridPaneWithRepresentativeStateForTheRow(minStatesList, i);
+            TextField ta;
             for (int j = 1; j < columns + 1; j++) {
                 char stimulus = arrStimulus[j - 1].charAt(0);
                 String cell = "" + mealyMachine.stateTransitionFunction(current, stimulus);
@@ -248,8 +233,6 @@ public class Controller {
                 ta = new TextField(cell);
                 ta.setEditable(false);
                 ta.setPrefWidth(45);
-                //ta.setStyle("#0000");
-                tf[j - 1][i - 1] = ta;
                 gridP2.add(ta, j, i);
             }
         }
@@ -257,7 +240,7 @@ public class Controller {
     /**
      * <b>Description:</b>
      * this function places the header of the stimuli typed by the user to provide a better view to the user
-     * @param grid represents the gridpane to edit the header.
+     * @param grid represents the GridPane the header will be added.
      */
     private void fillHeaders(GridPane grid) {
         for (int i = 1; i < columns + 1; i++) {

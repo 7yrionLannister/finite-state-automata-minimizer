@@ -14,7 +14,6 @@ public class Main extends Application {
      * @param args Used to launch the program.
      */
     public static void main(String[] args) {
-
         launch();
     }
     /**

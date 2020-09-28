@@ -10,19 +10,19 @@ public abstract class Automaton<Q, S, R> extends AdjacencyListGraph<Q> {
     /**
      * The stimuliSet represents the set of stimuli the automaton recognizes
      */
-    private HashSet<S> stimuliSet;
+    private final HashSet<S> stimuliSet;
     /**
      * The responsesSet represents the set of the responses the automaton can retrieve
      */
-    private HashSet<R> responsesSet;
+    private final HashSet<R> responsesSet;
     /**
      * f is the state transition function that tells where the automaton goes when in a certain state and receives a certain stimulus
      */
-    private HashMap<Q, HashMap<S, Q>> f;
+    private final HashMap<Q, HashMap<S, Q>> f;
     /**
      * q0 represents the initial state 0 of the automaton
      */
-    private Q q0;
+    private final Q q0;
 
     /** The method initializes the Automaton given the initial state
      * @param initialState The initial state for the automaton
@@ -106,66 +106,60 @@ public abstract class Automaton<Q, S, R> extends AdjacencyListGraph<Q> {
     /** Performs steps two and three of the partitioning algorithm for any automaton
      * @return The result of the partitioning algorithm; a set of refinements of the original automaton
      * */
-    public ArrayList<ArrayList<Q>> stepsTwoAndThreeOfPartitioningAlgorithm(ArrayList<ArrayList<Q>> originPartitions) {
-        ArrayList<ArrayList<Q>> previousPartitions = null;
+    public ArrayList<ArrayList<Q>> stepsTwoAndThreeOfPartitioningAlgorithm(ArrayList<ArrayList<Q>> parts) {
+        ArrayList<ArrayList<Q>> prevParts;
         //steps two and three
         boolean previousEqualsCurrent = false;
         while (!previousEqualsCurrent) {
-            previousPartitions = originPartitions;
+            prevParts = parts;
             for (S s : getStimuliSet()) {
                 //Partition the original set of partitions using stimulus s
                 HashMap<Integer, HashMap<Integer, ArrayList<Q>>> originPartitioned = new HashMap<>();
                 int newNumberOfPartitions = 0;
-                for (int i = 0; i < originPartitions.size(); i++) {
+                for (int i = 0; i < parts.size(); i++) {
                     //partition the subset at index i with the selected stimulus
-                    HashMap<Integer, ArrayList<Q>> refinement = refineSubset(originPartitions, i, s);
+                    HashMap<Integer, ArrayList<Q>> refinement = refineSubset(parts, i, s);
                     originPartitioned.put(i, refinement);
                     newNumberOfPartitions += refinement.size();
                 }
-                if (newNumberOfPartitions > originPartitions.size()) {
+                if (newNumberOfPartitions > parts.size()) {
                     /* Pk was actually partitioned.
                      * Replace the previous partition with the current one and fill the new "origin" with the last resulting partition
                      * */
-                    originPartitions = new ArrayList<>();
+                    parts = new ArrayList<>();
                     for (int i = 0; i < originPartitioned.size(); i++) {
-                        for (ArrayList<Q> parts : originPartitioned.get(i).values()) {
-                            originPartitions.add(parts);
-                        }
+                        parts.addAll(originPartitioned.get(i).values());
                     }
                     //get out of the stimuli loop as Pk != Pk+1
                     break;
                 }
             }
             //Is the partitioning algorithm done?
-            previousEqualsCurrent = previousPartitions.size() == originPartitions.size();
+            previousEqualsCurrent = prevParts.size() == parts.size();
         }
-        return originPartitions;
+        return parts;
     }
 
     /** The method allows to refine a particular target subset of a set of partitions taking into account a stimulus s
-     *
-     * @param originalPartition The original partition Pk
+     * @param parts             The original partition Pk
      * @param targetSubset      The index of the subset to be refined
      * @param s                 The stimulus to be passed to the machine
      * @return A new version of the original partition that may be the same if the stimulus did not take the states to different subsets, a refinement otherwise
      */
-    public HashMap<Integer, ArrayList<Q>> refineSubset(ArrayList<ArrayList<Q>> originalPartition, int targetSubset, S s) {
-        ArrayList<Q> targetPartition = originalPartition.get(targetSubset);
-        HashMap<Q, Integer> stateToIndexInOrigin = new HashMap<>();
+    public HashMap<Integer, ArrayList<Q>> refineSubset(ArrayList<ArrayList<Q>> parts, int targetSubset, S s) {
+        ArrayList<Q> targetPartition = parts.get(targetSubset);
         HashMap<Integer, ArrayList<Q>> refinedPartition = new HashMap<>();
 
         //Perform the second step in the partitioning algorithm
-        for (int i = 0; i < targetPartition.size(); i++) {
-            Q src = targetPartition.get(i);
+        for (Q src : targetPartition) {
             Q dst = stateTransitionFunction(src, s);
             boolean found = false;
-            int j = 0;
+            int j;
             //find the index of the subset where dst is allocated (the state the automaton ends when at state src given stimulus s to read)
-            for (j = 0; j < originalPartition.size() && !found; j++) {
-                ArrayList<Q> currentPartition = originalPartition.get(j);
+            for (j = 0; j < parts.size() && !found; j++) {
+                ArrayList<Q> currentPartition = parts.get(j);
                 found = currentPartition.contains(dst);
             }
-            stateToIndexInOrigin.put(src, j);
             if (!refinedPartition.containsKey(j)) {
                 refinedPartition.put(j, new ArrayList<>());
             }

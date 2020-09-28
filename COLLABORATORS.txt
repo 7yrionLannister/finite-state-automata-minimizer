@@ -1,0 +1,3 @@
+Christian Flor
+Daniel Fernández
+repo github: https://github.com/7yrionLannister/finite-state-automata-minimizer
